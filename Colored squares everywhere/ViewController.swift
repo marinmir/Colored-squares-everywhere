@@ -21,7 +21,7 @@ class ViewController: UIViewController {
     private var viewControllersStack: [ViewController] = []
     private var wasAlreadyCreated = false
     private var state = ViewControllerState()
-    private let enoughSelectedColors = 3
+    private let requiredSelectedColorsCount = 3
     
     // MARK: - Public methods
     override func viewDidLoad() {
@@ -34,8 +34,16 @@ class ViewController: UIViewController {
         
         setAppearance()
         
-        drawSelectedColor()
+        if (state.selectedColor != nil) {
+            drawSelectedColor(for: getViewForSelectedColor())
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
+        let indexPath = IndexPath(row: statesHistory.count - 1, section: 0)
+        screenHistory.scrollToItem(at: indexPath, at: .right, animated: false)
     }
     
     @IBAction func didSelectColor(_ sender: UITapGestureRecognizer) {
@@ -46,20 +54,14 @@ class ViewController: UIViewController {
         state.selectedColor = viewColor
         
         UIView.animate(withDuration: 1, animations: {
-            self.suggestedColorsView.bringSubviewToFront(sender.view!)
-            
-            NSLayoutConstraint.activate([
-                sender.view!.widthAnchor.constraint(equalTo: self.suggestedColorsView.widthAnchor),
-            ])
-            
-            self.suggestedColorsView.layoutIfNeeded()
+            self.drawSelectedColor(for: sender.view!)
             
         }, completion: { [weak self] _ in
             guard let self = self else {
                 return
             }
             
-            self.checkVictory()
+            self.chooseNextStep()
             }
         )
     }
@@ -79,6 +81,7 @@ class ViewController: UIViewController {
         screenHistory.showsHorizontalScrollIndicator = true
         screenHistory.isPagingEnabled = true
         screenHistory.backgroundColor = UIColor.white
+
         screenHistory.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(screenHistory)
         
@@ -90,7 +93,41 @@ class ViewController: UIViewController {
         ])
     }
     
-    private func getNewVC() -> ViewController {
+    private func chooseNextStep() {
+        if isEnoughSelectedColors() && wasSameColors() {
+            if navigationController?.viewControllers.count == requiredSelectedColorsCount {
+                finishGame()
+            } else {
+                returnToPreviousColor()
+            }
+        }
+        else {
+            goToNextVC()
+        }
+    }
+    
+    private func finishGame() {
+        let newVC = createNewVC()
+        navigationController?.setViewControllers([newVC], animated: true)
+        newVC.showVictoryAlert()
+    }
+    
+    private func returnToPreviousColor() {
+        guard let lastVC = navigationController?.viewControllers[navigationController!.viewControllers.count - requiredSelectedColorsCount - 1] as? ViewController else {
+            assert(false, "There should be no other view controllers")
+            return
+        }
+        lastVC.wasAlreadyCreated = false
+        lastVC.viewControllersStack.removeLast()
+        navigationController?.popToViewController(lastVC, animated: true)
+    }
+    
+    private func goToNextVC() {
+        let newVC = getNextVC()
+        navigationController?.pushViewController(newVC, animated: true)
+    }
+    
+    private func getNextVC() -> ViewController {
         if !wasAlreadyCreated {
             let newVC = createNewVC()
             
@@ -99,7 +136,6 @@ class ViewController: UIViewController {
             wasAlreadyCreated = true
             
             return newVC
-            
         } else {
             let lastVC = viewControllersStack.removeLast()
             let newVC = createNewVC()
@@ -136,10 +172,8 @@ class ViewController: UIViewController {
         }
     }
     
-    private func drawSelectedColor() {
+    private func drawSelectedColor(for selectedView: UIView) {
         if state.selectedColor != nil {
-            
-            let selectedView = getViewForSelectedColor()
             suggestedColorsView.bringSubviewToFront(selectedView)
             
             NSLayoutConstraint.activate([
@@ -151,23 +185,14 @@ class ViewController: UIViewController {
     }
     
     private func wasSameColors() -> Bool {
-        
         let lastColor = statesHistory[statesHistory.count - 1].selectedColor ?? UIColor.white
         let preLastColor = statesHistory[statesHistory.count - 2].selectedColor ?? UIColor.white
         
-        if state.selectedColor == lastColor && state.selectedColor == preLastColor {
-            return true
-        } else {
-            return false
-        }
+        return state.selectedColor == lastColor && state.selectedColor == preLastColor
     }
     
     private func isEnoughSelectedColors() -> Bool {
-        if (statesHistory.count + 1) >= enoughSelectedColors { // +1 for current selected color
-            return true
-        } else {
-            return false
-        }
+        return (statesHistory.count + 1) >= requiredSelectedColorsCount // +1 for current controller
     }
     
     private func showVictoryAlert() {
@@ -177,33 +202,11 @@ class ViewController: UIViewController {
         present(alertVC, animated: true)
     }
     
-    private func checkVictory() {
-        if isEnoughSelectedColors() && wasSameColors(){
-                
-                if navigationController?.viewControllers.count == enoughSelectedColors {
-                    let newVC = createNewVC()
-                    navigationController?.setViewControllers([newVC], animated: true)
-                    newVC.showVictoryAlert()
-                } else {
-                    guard let lastVC = navigationController?.viewControllers[navigationController!.viewControllers.count - enoughSelectedColors - 1] as? ViewController else {
-                        assert(false, "There should be no other view controllers")
-                        return
-                    }
-                    lastVC.wasAlreadyCreated = false
-                    lastVC.viewControllersStack.removeLast()
-                    navigationController?.popToViewController(lastVC, animated: true)
-                }
-        }
-        else {
-            let newVC = getNewVC()
-            navigationController?.pushViewController(newVC, animated: true)
-        }
-    }
-    
 }
 
 // MARK: - UICollectionViewDataSource, UICollectionViewDelegateFlowLayout
 extension ViewController: UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
+    
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return statesHistory.count
     }

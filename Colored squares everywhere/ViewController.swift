@@ -21,6 +21,7 @@ class ViewController: UIViewController {
     private var viewControllersStack: [ViewController] = []
     private var wasAlreadyCreated = false
     private var state = ViewControllerState()
+    private let enoughSelectedColors = 3
     
     // MARK: - Public methods
     override func viewDidLoad() {
@@ -33,7 +34,7 @@ class ViewController: UIViewController {
         
         setAppearance()
         
-        drawSelectedView()
+        drawSelectedColor()
         
     }
     
@@ -58,8 +59,7 @@ class ViewController: UIViewController {
                 return
             }
             
-            let newVC = self.getNewVC()
-            self.navigationController?.pushViewController(newVC, animated: true)
+            self.checkVictory()
             }
         )
     }
@@ -100,7 +100,7 @@ class ViewController: UIViewController {
             
             return newVC
             
-            } else {
+        } else {
             let lastVC = viewControllersStack.removeLast()
             let newVC = createNewVC()
             
@@ -136,7 +136,7 @@ class ViewController: UIViewController {
         }
     }
     
-    private func drawSelectedView() {
+    private func drawSelectedColor() {
         if state.selectedColor != nil {
             
             let selectedView = getViewForSelectedColor()
@@ -147,6 +147,56 @@ class ViewController: UIViewController {
             ])
             
             suggestedColorsView.layoutIfNeeded()
+        }
+    }
+    
+    private func wasSameColors() -> Bool {
+        
+        let lastColor = statesHistory[statesHistory.count - 1].selectedColor ?? UIColor.white
+        let preLastColor = statesHistory[statesHistory.count - 2].selectedColor ?? UIColor.white
+        
+        if state.selectedColor == lastColor && state.selectedColor == preLastColor {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    private func isEnoughSelectedColors() -> Bool {
+        if (statesHistory.count + 1) >= enoughSelectedColors { // +1 for current selected color
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    private func showVictoryAlert() {
+        let alertVC = UIAlertController(title: "Victory!!!", message: "You won", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alertVC.addAction(okAction)
+        present(alertVC, animated: true)
+    }
+    
+    private func checkVictory() {
+        if isEnoughSelectedColors() && wasSameColors(){
+                
+                if navigationController?.viewControllers.count == enoughSelectedColors {
+                    let newVC = createNewVC()
+                    navigationController?.setViewControllers([newVC], animated: true)
+                    newVC.showVictoryAlert()
+                } else {
+                    guard let lastVC = navigationController?.viewControllers[navigationController!.viewControllers.count - enoughSelectedColors - 1] as? ViewController else {
+                        assert(false, "There should be no other view controllers")
+                        return
+                    }
+                    lastVC.wasAlreadyCreated = false
+                    lastVC.viewControllersStack.removeLast()
+                    navigationController?.popToViewController(lastVC, animated: true)
+                }
+        }
+        else {
+            let newVC = getNewVC()
+            navigationController?.pushViewController(newVC, animated: true)
         }
     }
     

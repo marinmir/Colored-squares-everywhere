@@ -13,6 +13,7 @@
 		0E43D18C2443C16700CB59E0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0E43D18B2443C16700CB59E0 /* Assets.xcassets */; };
 		0E43D18F2443C16700CB59E0 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0E43D18D2443C16700CB59E0 /* LaunchScreen.storyboard */; };
 		0E43D1972443C26900CB59E0 /* ViewControllerState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E43D1962443C26900CB59E0 /* ViewControllerState.swift */; };
+		0E89D2F12449FC53006E0912 /* ScreenHistoryCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E89D2F02449FC53006E0912 /* ScreenHistoryCell.swift */; };
 		0EDBD7FA24466266001A466F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0EDBD7F924466266001A466F /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -25,6 +26,7 @@
 		0E43D18E2443C16700CB59E0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0E43D1902443C16700CB59E0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0E43D1962443C26900CB59E0 /* ViewControllerState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerState.swift; sourceTree = "<group>"; };
+		0E89D2F02449FC53006E0912 /* ScreenHistoryCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenHistoryCell.swift; sourceTree = "<group>"; };
 		0EDBD7F924466266001A466F /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -66,6 +68,7 @@
 				0E43D18D2443C16700CB59E0 /* LaunchScreen.storyboard */,
 				0EDBD7F924466266001A466F /* Main.storyboard */,
 				0E43D1902443C16700CB59E0 /* Info.plist */,
+				0E89D2F02449FC53006E0912 /* ScreenHistoryCell.swift */,
 			);
 			path = "Colored squares everywhere";
 			sourceTree = "<group>";
@@ -143,6 +146,7 @@
 			files = (
 				0E43D1972443C26900CB59E0 /* ViewControllerState.swift in Sources */,
 				0E43D1872443C16500CB59E0 /* ViewController.swift in Sources */,
+				0E89D2F12449FC53006E0912 /* ScreenHistoryCell.swift in Sources */,
 				0E43D1832443C16500CB59E0 /* AppDelegate.swift in Sources */,
 				0E43D1852443C16500CB59E0 /* SceneDelegate.swift in Sources */,
 			);
